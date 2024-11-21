@@ -4,6 +4,7 @@ COLOR_SERVER="\033[1;34m"
 COLOR_NPM="\033[1;32m"
 COLOR_QUEUE="\033[1;35m"
 COLOR_SCHEDULE="\033[1;36m"
+COLOR_REVERB="\033[1;33m"
 COLOR_ERROR="\033[1;31m"
 COLOR_RESET="\033[0m"
 
@@ -25,6 +26,7 @@ RUN_SERVER=false
 RUN_NPM=false
 RUN_QUEUE=false
 RUN_SCHEDULE=false
+RUN_REVERB=false
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
@@ -32,13 +34,14 @@ while [[ "$#" -gt 0 ]]; do
     npm) RUN_NPM=true ;;
     queue) RUN_QUEUE=true ;;
     schedule) RUN_SCHEDULE=true ;;
+    reverb) RUN_REVERB=true ;;
     *) echo "Unknown option: $1"; exit 1 ;;
   esac
   shift
 done
 
-if ! $RUN_SERVER && ! $RUN_NPM && ! $RUN_QUEUE && ! $RUN_SCHEDULE; then
-  echo "Usage: $0 [serve] [npm] [queue] [schedule]"
+if ! $RUN_SERVER && ! $RUN_NPM && ! $RUN_QUEUE && ! $RUN_SCHEDULE && ! $RUN_REVERB; then
+  echo "Usage: $0 [serve] [npm] [queue] [schedule] [reverb]"
   echo "Please specify at least one process to run."
   exit 1
 fi
@@ -65,6 +68,12 @@ fi
 if $RUN_SCHEDULE; then
   echo -e "${COLOR_SCHEDULE}[INFO] Starting 'php artisan schedule:work'...${COLOR_RESET}"
   run_cmd "SCHEDULE" "$COLOR_SCHEDULE" php artisan schedule:work &
+  PIDS="$PIDS $!"
+fi
+
+if $RUN_REVERB; then
+  echo -e "${COLOR_REVERB}[INFO] Starting 'php artisan reverb:start'...${COLOR_RESET}"
+  run_cmd "REVERB" "$COLOR_REVERB" php artisan reverb:start &
   PIDS="$PIDS $!"
 fi
 
